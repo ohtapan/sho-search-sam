@@ -1,34 +1,34 @@
 import os
 import json
-import csv
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
 from gensim.models import KeyedVectors
 
-csv_file = open("./kampo-sho-data.csv", "r", encoding="utf-8", errors="", newline="" )
-f = csv.reader(csv_file, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
-
-header = next(f)
-
-sholist = []
-for row in f:
-    b = (row[1], row[4])
-    if b[1] != "":
-        sholist.append(b)
-
+dynamodb = boto3.resource('dynamodb')
 model = KeyedVectors.load_word2vec_format('./jawiki_retrofitted_add_allsho.model', binary=True)
 
+def get_records(table, **kwargs):
+    while True:
+        response = table.scan(**kwargs)
+        for item in response['Items']:
+            yield item
+        if 'LastEvaluatedKey' not in response:
+            break
+        kwargs.update(ExclusiveStartKey=response['LastEvaluatedKey'])
 
 def lambda_handler(event, context):
+
     word = json.loads(event['body'])['word']
 
+    table_name = "kampo-sho-db-senkojissyu"
+    dynamotable = dynamodb.Table(table_name)
+    records = get_records(dynamotable)
+
     results = []
-    for sho in sholist:
-        similarity = str(model.similarity(word, sho[0]))
-        flag = "False"
-        if word in sho[1]:
-            flag = "True"
-
-        results.append({'name': sho[0], 'similarity': similarity, 'symptoms': sho[1]})
-
+    for record in records:
+        if record['uuid'] in model.index_to_key:
+            similarity = str(model.similarity(word, record['uuid']))
+            results.append({'name': record['name'], 'similarity': similarity, 'description': record['description'], 'symptoms': record['symptoms'], 'region': record['region'], 'crude_drags': record['crude_drags'], 'prescriptions':record['prescriptions'], 'treatment':record['treatment'], 'references':record['references']})
     sorted_results = sorted(results, key=lambda x:x['similarity'], reverse=True)
 
     return {

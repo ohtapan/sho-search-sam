@@ -2,9 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   python3.8
-
   Sample SAM Template for word2vec-test
-
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -22,6 +20,8 @@ Resources:
           Properties:
             Path: /search
             Method: post
+      Policies:
+      - AmazonDynamoDBFullAccess
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./sho-search-lambda
