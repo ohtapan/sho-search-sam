@@ -1,6 +1,6 @@
 #!/bin/sh
-FILE_ID=1bxTTQ_HDPn-EDVWJFWne-Kdfgh1fbE7z
-FILE_NAME=jawiki_retrofitted_add_allsho.model
+FILE_ID=1124AxTicwxcjwKKSjLCk-MoXuXAKwSNj
+FILE_NAME=jawiki_retrofitted_add_allsho_uuid.bin
 MODEL_PATH=./sho-search-lambda/model
 mkdir ${MODEL_PATH}
 curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=${FILE_ID}" > /dev/null

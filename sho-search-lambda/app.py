@@ -8,7 +8,7 @@ from gensim.models import KeyedVectors
 from janome.tokenizer import Tokenizer
 
 dynamodb = boto3.resource('dynamodb')
-model = KeyedVectors.load_word2vec_format('./jawiki_retrofitted_add_allsho.model', binary=True)
+model = KeyedVectors.load_word2vec_format('./jawiki_retrofitted_add_allsho_uuid.bin', binary=True)
 tokenizer = Tokenizer()
 
 def get_records(table, **kwargs):
